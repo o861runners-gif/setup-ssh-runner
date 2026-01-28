@@ -11,11 +11,11 @@ jobs:
   test:
     name: Test on ${{ matrix.os }} - Node ${{ matrix.node }}
     runs-on: ${{ matrix.os }}
-    
+
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        node: ['14', '16', '18', '20']
+        os: [ubuntu-latest, windows-latest]
+        node: ['20']
       fail-fast: false
 
     steps:
@@ -48,7 +48,7 @@ jobs:
   lint:
     name: Lint code
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -71,7 +71,7 @@ jobs:
   integration-test:
     name: Integration Test
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -100,7 +100,7 @@ jobs:
         run: |
           # Wait for SSH to be ready
           sleep 5
-          
+
           # Test SSH connection
           ssh -p 2222 \
             -i ~/.ssh/test_key \

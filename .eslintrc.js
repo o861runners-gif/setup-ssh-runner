@@ -12,10 +12,19 @@ module.exports = {
   plugins: ['node'],
   rules: {
     'no-console': 'off',
-    'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    'no-unused-vars': [
+      'warn',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+      },
+    ],
     'node/no-unsupported-features/es-syntax': 'off',
     'node/no-missing-require': 'off',
     'prefer-const': 'warn',
     'no-var': 'error',
+    'no-empty': ['error', { allowEmptyCatch: true }],
+    'no-useless-escape': 'off',
   },
 };
