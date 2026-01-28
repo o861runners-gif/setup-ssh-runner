@@ -24,13 +24,7 @@ jobs:
         with:
           node-version: '18'
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@YOUR_ORG'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run tests
-        run: npm test
+          scope: '@o861runners-gif'
 
       - name: Update package.json for GitHub Packages
         run: |
@@ -38,7 +32,7 @@ jobs:
           node -e "
             const pkg = require('./package.json');
             if (!pkg.name.startsWith('@')) {
-              pkg.name = '@YOUR_ORG/setup-ssh-tunnel';
+              pkg.name = '@o861runners-gif/setup-ssh-tunnel';
             }
             pkg.publishConfig = {
               registry: 'https://npm.pkg.github.com'
@@ -55,4 +49,4 @@ jobs:
         if: success()
         run: |
           echo "✅ Package published successfully to GitHub Packages!"
-          echo "📦 Check: https://github.com/YOUR_ORG/setup-ssh-tunnel/packages"
+          echo "📦 Check: https://github.com/o861runners-gif/setup-ssh-tunnel/packages"
