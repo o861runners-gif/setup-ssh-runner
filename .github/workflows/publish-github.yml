@@ -1,0 +1,58 @@
+name: Publish to GitHub Packages
+
+on:
+  workflow_dispatch:
+  release:
+    types: [created]
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish-gpr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@YOUR_ORG'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Update package.json for GitHub Packages
+        run: |
+          # Ensure package name is scoped
+          node -e "
+            const pkg = require('./package.json');
+            if (!pkg.name.startsWith('@')) {
+              pkg.name = '@YOUR_ORG/setup-ssh-tunnel';
+            }
+            pkg.publishConfig = {
+              registry: 'https://npm.pkg.github.com'
+            };
+            require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+          "
+
+      - name: Publish to GitHub Packages
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify success
+        if: success()
+        run: |
+          echo "✅ Package published successfully to GitHub Packages!"
+          echo "📦 Check: https://github.com/YOUR_ORG/setup-ssh-tunnel/packages"

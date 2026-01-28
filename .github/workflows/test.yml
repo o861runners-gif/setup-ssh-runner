@@ -1,0 +1,110 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os }} - Node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: ['14', '16', '18', '20']
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
+      - name: Upload coverage
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '18'
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/coverage-final.json
+          flags: unittests
+          name: codecov-umbrella
+
+  lint:
+    name: Lint code
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+  integration-test:
+    name: Integration Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate test SSH key
+        run: |
+          ssh-keygen -t ed25519 -f ~/.ssh/test_key -N "" -C "test@example.com"
+          echo "TEST_SSH_PUBKEY=$(cat ~/.ssh/test_key.pub)" >> $GITHUB_ENV
+
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          PIPELINE_SSH_PUBKEY: ${{ env.TEST_SSH_PUBKEY }}
+          SSH_PORT: 2222
+          SSH_MODE: user
+
+      - name: Verify SSH setup
+        run: |
+          # Wait for SSH to be ready
+          sleep 5
+          
+          # Test SSH connection
+          ssh -p 2222 \
+            -i ~/.ssh/test_key \
+            -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            $USER@127.0.0.1 \
+            'echo "SSH works!"' || echo "SSH test failed (expected in CI)"

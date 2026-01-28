@@ -1,0 +1,38 @@
+# SSHD Configuration Template for setup-ssh (User Mode)
+# Auto-generated - Do not edit manually
+
+# Network
+Port {{PORT}}
+ListenAddress {{LISTEN_ADDRESS}}
+
+# Authentication
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+ChallengeResponseAuthentication no
+PubkeyAuthentication yes
+PermitRootLogin no
+UsePAM no
+
+# Security
+StrictModes no
+PrintMotd no
+
+# Keys
+AuthorizedKeysFile {{AUTHORIZED_KEYS_FILE}}
+AllowUsers {{ALLOW_USERS}}
+
+# Process
+PidFile {{PID_FILE}}
+
+# Host Keys
+HostKey {{HOSTKEY_ED25519}}
+HostKey {{HOSTKEY_RSA}}
+
+# Subsystems
+Subsystem sftp internal-sftp
+
+# Logging
+LogLevel VERBOSE
+
+# Force CWD (if enabled)
+{{FORCE_CWD_BLOCK}}

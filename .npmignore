@@ -1,0 +1,56 @@
+# Tests
+tests/
+*.test.js
+coverage/
+.nyc_output/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+azure-pipelines.yml
+.circleci/
+
+# Development files
+.eslintrc.js
+.prettierrc
+.prettierignore
+.editorconfig
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Documentation source
+docs/
+*.md.backup
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+*~
+
+# Build artifacts
+dist/
+build/
