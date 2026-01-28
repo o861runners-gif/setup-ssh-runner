@@ -1,0 +1,35 @@
+name: Connect SSH
+
+on:
+  workflow_dispatch:
+
+jobs:
+  connect-ssh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Connect tailsacle
+        run: |
+          chmod +x ./tests/setup-tailscale.js
+          npm i -g github:@tolaptrinhdh61-spec/dotenvrtdb
+          dotenvrtdb --eUrl ${{ secrets.DOTENVRTDB_URL }} node ./tests/setup-tailscale.js
+          while true; do
+            echo "⏰ $(date): Remote access still running..."
+            if command -v tailscale &> /dev/null; then
+              TS_STATUS=$(tailscale status --json 2>/dev/null | jq -r '.BackendState' 2>/dev/null || echo "unknown")
+              echo "   Tailscale: $TS_STATUS"
+            fi
+
+            sleep 300
+          done
